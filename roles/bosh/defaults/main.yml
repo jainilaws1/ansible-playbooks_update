@@ -18,7 +18,8 @@
 bosh_deployment_directory: "{{ ansible_env['HOME'] }}/{{ bosh_director_name }}"
 
 # BOSH
-bosh_release_version: 223
+#bosh_release_version: 223
+bosh_release_version: 271
 bosh_release_url: https://bosh.io/d/github.com/cloudfoundry/bosh?v={{ bosh_release_version }}
 bosh_release_sha1: 4fdb241703160f5fc426ee6f2e16a9d125073460
 
