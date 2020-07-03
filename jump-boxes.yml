@@ -135,7 +135,8 @@
         cmd: ln -fs /usr/bin/gpg2 /usr/bin/gpg
     - name: Download GPG keys for Ruby
       shell: 
-        cmd: ./download_gpg.sh 
+        cmd: chmod 755 download_gpg.sh\
+             ./download_gpg.sh
     - name: Install libgmp
       apt: name=libgmp-dev state=present
       become: yes
