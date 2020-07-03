@@ -1,0 +1,59 @@
+# Copyright (c) 2015 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+---
+
+bosh_deployment_directory: "{{ ansible_env['HOME'] }}/{{ bosh_director_name }}"
+
+# BOSH
+bosh_release_version: 223
+bosh_release_url: https://bosh.io/d/github.com/cloudfoundry/bosh?v={{ bosh_release_version }}
+bosh_release_sha1: 4fdb241703160f5fc426ee6f2e16a9d125073460
+
+bosh_stemcell_version: 3012
+
+bosh_ephemeral_disk_size: 25_000
+bosh_disk_size: 20_000
+
+bosh_elastic_ip: null
+bosh_subnet_id: null
+bosh_availability_zone: null
+bosh_access_key_id: null
+bosh_secret_access_key: null
+
+bosh_dns:
+  - 10.0.0.2
+
+bosh_nats_password: nats-password
+bosh_redis_password: redis-password
+bosh_postgres_password: postgres-password
+bosh_registry_password: admin
+bosh_director_password: director-password
+bosh_agent_password: agent-password
+bosh_admin_password: admin
+bosh_hm_password: hm-password
+bosh_default_security_groups:
+  - bosh
+bosh_region: us-east-1
+bosh_ntp:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+bosh_mbus_password: mbus-password
+bosh_iam_instance_profile: null
+bosh_default_key_name: bosh
+bosh_private_key: "{{ bosh_deployment_directory }}/{{ bosh_default_key_name }}.yml"
+bosh_director_name: my-bosh
+
+# vi:et:sw=2 ts=2 sts=2 ft=ansible
