@@ -1,9 +1,4 @@
-[![Build Status](https://travis-ci.org/rvm/rvm1-ansible.svg?branch=master)](https://travis-ci.org/rvm/rvm1-ansible)
-[![OpenCollective](https://opencollective.com/rvm/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/rvm/sponsors/badge.svg)](#sponsors)
-[![Ansible Role](https://img.shields.io/badge/role-rvm_io-red.svg)](https://galaxy.ansible.com/rvm/ruby)
-
-## What is rvm1-ansible?
+## What is rvm1-ansible? [![Build Status](https://secure.travis-ci.org/rvm/rvm1-ansible.png)](http://travis-ci.org/rvm/rvm1-ansible)
 
 It is an [Ansible](http://www.ansible.com/home) role to install and manage ruby versions using rvm.
 
@@ -21,46 +16,39 @@ using a version manager while still benefiting from what rvm has to offer.
 
 ## Installation
 
-`$ ansible-galaxy install rvm.ruby`
+`$ ansible-galaxy install rvm_io.rvm1-ruby`
 
 ## Role variables
 
 Below is a list of default values that you can configure:
 
-```yaml
+```
 ---
 
 # Install 1 or more versions of ruby
 # The last ruby listed will be set as the default ruby
 rvm1_rubies:
-  - 'ruby-2.3.1'
-
-# Install the bundler gem
-rvm1_bundler_install: True
+  - 'ruby-2.1.3'
 
 # Delete a specific version of ruby (ie. ruby-2.1.0)
 rvm1_delete_ruby:
 
-# Install path for rvm (defaults to single user)
-# NOTE: If you are doing a ROOT BASED INSTALL then make sure you
-#       set the install path to something like '/usr/local/rvm'
-rvm1_install_path: '~/.rvm'
+# Install path for rvm (defaults to system wide)
+rvm1_install_path: '/usr/local/rvm'
 
 # Add or remove any install flags
-# NOTE: If you are doing a ROOT BASED INSTALL then
-#       make sure you REMOVE the --user-install flag below
-rvm1_install_flags: '--auto-dotfiles  --user-install'
+# NOTE: If you are doing a USER BASED INSTALL then
+#       make sure you ADD the --user-install flag below
+rvm1_install_flags: '--auto-dotfiles'
 
 # Add additional ruby install flags
 rvm1_ruby_install_flags:
 
 # Set the owner for the rvm directory
-# NOTE: If you are doing a ROOT BASED INSTALL then
-#       make sure you set rvm1_user to 'root'
-rvm1_user: 'ubuntu'
+rvm1_user: 'root'
 
 # URL for the latest installer script
-rvm1_rvm_latest_installer: 'https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer'
+rvm1_rvm_latest_installer: 'https://raw.githubusercontent.com/wayneeseguin/rvm/master/binscripts/rvm-installer'
 
 # rvm version to use
 rvm1_rvm_version: 'stable'
@@ -72,73 +60,52 @@ rvm1_rvm_check_for_updates: True
 # Note: Unless you know what you're doing, just keep it as is
 #           Identity proof: https://keybase.io/mpapis
 #           PGP message: https://rvm.io/mpapis.asc
-rvm1_gpg_keys: '409B6B1796C275462A1703113804BB82D39DC0E3'
+rvm1_gpg_keys: 'D39DC0E3'
 
 # The GPG key server
-rvm1_gpg_key_server: 'hkp://pool.sks-keyservers.net'
+rvm1_gpg_key_server: 'hkp://keys.gnupg.net'
 
 # autolib mode, see https://rvm.io/rvm/autolibs
 rvm1_autolib_mode: 3
 ```
 
-## Example playbooks
+## Example playbook
 
-```yaml
+```
 ---
 
-- name: Configure servers with ruby support for single user
+- name: Configure servers with ruby support
   hosts: all
 
   roles:
-    - { role: rvm.ruby,
-        tags: ruby,
-        rvm1_rubies: ['ruby-2.3.1'],
-        rvm1_user: 'ubuntu'
-      }
+    - { role: rvm_io.rvm1-ruby, tags: ruby, sudo: True }
 ```
-
-If you need to pass a list of ruby versions, pass it in an array like so.
-
-```yaml
----
-- name: Configure servers with ruby support system wide
-  hosts: all
-  roles:
-    - { role: rvm.ruby,
-        tags: ruby,
-        become: yes,
-
-        rvm1_rubies: ['ruby-2.2.5','ruby-2.3.1'],
-        rvm1_install_flags: '--auto-dotfiles',     # Remove --user-install from defaults
-        rvm1_install_path: /usr/local/rvm,         # Set to system location
-        rvm1_user: root                            # Need root account to access system location
-      }
-```
-_rvm_rubies must be specified via `ruby-x.x.x` so that if you want_
-_ruby 2.2.5, you will need to pass in an array **rvm_rubies: ['ruby-2.2.5']**_
-
 
 #### System wide installation
 
-The above example would setup ruby system wide. It's very important that you run the
-play as root because it will need to write to a system location specified by rvm1_install_path
+The above example would setup ruby system wide. It's very important that you
+run the play with sudo because it will need to write to `/usr/local/rvm`.
 
-#### To the same user as `ansible_user`
+#### To the same user as `ansible_ssh_user`
 
-In this case, just overwrite `rvm_install_path` and by default is set the `--user-install` flag:
+In this case, just overwrite `rvm_install_path` and set the `--user-install` flag:
 
-```yaml
+**Note:** you still need to use sudo because during the ruby
+  installation phase rvm will internally make calls using sudo
+  to install certain ruby dependencies.
+
+```
 rvm1_install_flags: '--auto-dotfiles --user-install'
-rvm1_install_path: '/home/{{ ansible_user }}/.rvm'
+rvm1_install_path: '/home/{{ ansible_ssh_user }}/.rvm'
 ```
 
-#### To a user that is not `ansible_user`
+#### To a user that is not `ansible_ssh_user`
 
-You **will need root access here** because you will be writing outside the ansible
+You **will need sudo here** because you will be writing outside the ansible
 user's home directory. Other than that it's the same as above, except you will
 supply a different user account:
 
-```yaml
+```
 rvm1_install_flags: '--auto-dotfiles --user-install'
 rvm1_install_path: '/home/someuser/.rvm'
 ```
@@ -163,65 +130,12 @@ Just add `--extra-vars 'rvm1_delete_ruby=ruby-2.1.0'` to the end of your play bo
 
 ## Requirements
 
-- Tested on CentOS 6 and 7
-- Tested on Debian 8 and 9
-- Tested on Ubuntu 14.04 and 16.04
+- Tested on ubuntu 12.04 LTS but it should work on other versions that are similar.
+- Tested on RHEL6.5 and CentOS 6.5
 
 ## Ansible galaxy
 
-You can find it on the official [ansible galaxy](https://galaxy.ansible.com/rvm/ruby) if you want to rate it.
-
-## Contributing
-
-### Backers
-
-[Become a backer](https://opencollective.com/rvm#backer) and support us with a small monthly donation to help us continue our activities.
-
-[![Backer](https://opencollective.com/rvm/backer/0/avatar.svg)](https://opencollective.com/rvm/backer/0/website)
-[![Backer](https://opencollective.com/rvm/backer/1/avatar.svg)](https://opencollective.com/rvm/backer/1/website)
-[![Backer](https://opencollective.com/rvm/backer/2/avatar.svg)](https://opencollective.com/rvm/backer/2/website)
-[![Backer](https://opencollective.com/rvm/backer/3/avatar.svg)](https://opencollective.com/rvm/backer/3/website)
-[![Backer](https://opencollective.com/rvm/backer/4/avatar.svg)](https://opencollective.com/rvm/backer/4/website)
-[![Backer](https://opencollective.com/rvm/backer/5/avatar.svg)](https://opencollective.com/rvm/backer/5/website)
-[![Backer](https://opencollective.com/rvm/backer/6/avatar.svg)](https://opencollective.com/rvm/backer/6/website)
-[![Backer](https://opencollective.com/rvm/backer/7/avatar.svg)](https://opencollective.com/rvm/backer/7/website)
-[![Backer](https://opencollective.com/rvm/backer/8/avatar.svg)](https://opencollective.com/rvm/backer/8/website)
-[![Backer](https://opencollective.com/rvm/backer/9/avatar.svg)](https://opencollective.com/rvm/backer/9/website)
-[![Backer](https://opencollective.com/rvm/backer/10/avatar.svg)](https://opencollective.com/rvm/backer/10/website)
-[![Backer](https://opencollective.com/rvm/backer/11/avatar.svg)](https://opencollective.com/rvm/backer/11/website)
-[![Backer](https://opencollective.com/rvm/backer/12/avatar.svg)](https://opencollective.com/rvm/backer/12/website)
-[![Backer](https://opencollective.com/rvm/backer/13/avatar.svg)](https://opencollective.com/rvm/backer/13/website)
-[![Backer](https://opencollective.com/rvm/backer/14/avatar.svg)](https://opencollective.com/rvm/backer/14/website)
-[![Backer](https://opencollective.com/rvm/backer/15/avatar.svg)](https://opencollective.com/rvm/backer/15/website)
-[![Backer](https://opencollective.com/rvm/backer/16/avatar.svg)](https://opencollective.com/rvm/backer/16/website)
-[![Backer](https://opencollective.com/rvm/backer/17/avatar.svg)](https://opencollective.com/rvm/backer/17/website)
-[![Backer](https://opencollective.com/rvm/backer/18/avatar.svg)](https://opencollective.com/rvm/backer/18/website)
-[![Backer](https://opencollective.com/rvm/backer/19/avatar.svg)](https://opencollective.com/rvm/backer/19/website)
-
-### Sponsors
-
-[Become a sponsor](https://opencollective.com/rvm#sponsor) and get your logo on our README on Github with a link to your site.
-
-[![Sponsor](https://opencollective.com/rvm/sponsor/0/avatar.svg)](https://opencollective.com/rvm/sponsor/0/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/1/avatar.svg)](https://opencollective.com/rvm/sponsor/1/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/2/avatar.svg)](https://opencollective.com/rvm/sponsor/2/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/3/avatar.svg)](https://opencollective.com/rvm/sponsor/3/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/4/avatar.svg)](https://opencollective.com/rvm/sponsor/4/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/5/avatar.svg)](https://opencollective.com/rvm/sponsor/5/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/6/avatar.svg)](https://opencollective.com/rvm/sponsor/6/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/7/avatar.svg)](https://opencollective.com/rvm/sponsor/7/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/8/avatar.svg)](https://opencollective.com/rvm/sponsor/8/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/9/avatar.svg)](https://opencollective.com/rvm/sponsor/9/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/10/avatar.svg)](https://opencollective.com/rvm/sponsor/10/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/11/avatar.svg)](https://opencollective.com/rvm/sponsor/11/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/12/avatar.svg)](https://opencollective.com/rvm/sponsor/12/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/13/avatar.svg)](https://opencollective.com/rvm/sponsor/13/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/14/avatar.svg)](https://opencollective.com/rvm/sponsor/14/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/15/avatar.svg)](https://opencollective.com/rvm/sponsor/15/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/16/avatar.svg)](https://opencollective.com/rvm/sponsor/16/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/17/avatar.svg)](https://opencollective.com/rvm/sponsor/17/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/18/avatar.svg)](https://opencollective.com/rvm/sponsor/18/website)
-[![Sponsor](https://opencollective.com/rvm/sponsor/19/avatar.svg)](https://opencollective.com/rvm/sponsor/19/website)
+You can find it on the official [ansible galaxy](https://galaxy.ansible.com/list#/roles/1087) if you want to rate it.
 
 ## License
 
