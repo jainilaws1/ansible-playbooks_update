@@ -45,8 +45,8 @@ cf_release_version: 222
 docker_release_version: 23
 
 # UAA CLI
+#uaac_version: 3.1.5
 uaac_version: 3.1.5
-
 # Consul
 consul_version: 0.6.0
 
