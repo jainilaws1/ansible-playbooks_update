@@ -29,9 +29,9 @@ bosh_init_version: 0.0.100
 bosh_cli_version: 1.3169.0
 
 # BOSH
-bosh_release_version: 271.1.0
+bosh_release_version: 255
 #bosh_release_sha1: d5a108cf32c64a4d0f69bc2b2d8535ac1203f03c
-bosh_release_sha1: a3d789e55ff99c41a8a929ec1a9de58ad3dbfce4
+bosh_release_sha1: 923dfb8c26fab7041c0a3e591f0e92f3c4bca29e
 bosh_ntp: "{{ ntp_server | default(['0.pool.ntp.org', '1.pool.ntp.org']) }}"
 bosh_stemcell_version: 3104
 
