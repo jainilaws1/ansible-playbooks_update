@@ -22,6 +22,7 @@
 
 - name: Create a deployment manifest
   template: src=bosh.yml.j2 dest={{ bosh_deployment_directory }}/bosh.yml
+  shell: ./modify_bosh_yml.sh {{ bosh_deployment_directory }}/bosh.yml
   notify:
     - Deploy
 
