@@ -22,6 +22,9 @@
 
 - name: Create a deployment manifest
   template: src=bosh.yml.j2 dest={{ bosh_deployment_directory }}/bosh.yml
+- name: Change the permissions for modify_bash_yml.sh 
+  shell: chmod 755 modify_bosh_yml.sh
+- name: Change the security group id with group name
   shell: ./modify_bosh_yml.sh {{ bosh_deployment_directory }}/bosh.yml
   notify:
     - Deploy
