@@ -17,8 +17,8 @@
 
 # RVM
 rvm1_rubies:
-  #- ruby-2.2.4
-  - ruby-1.9.3
+  - ruby-2.2.4
+  
 
 rvm1_install_path: /usr/local/rvm
 
