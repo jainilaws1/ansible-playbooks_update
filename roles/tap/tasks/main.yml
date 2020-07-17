@@ -17,7 +17,7 @@
 
 - include_vars: "{{ provider }}.yml"
 
-- git: repo=https://github.com/jainilaws1/uaa-intel-boshrelease.git
+- git: repo=https://github.com/trustedanalytics/uaa-intel-boshrelease.git
        dest={{ ansible_env['HOME'] }}/uaa-intel-boshrelease recursive=no
 
 - shell: bosh --no-color -n upload release {{ item }}
